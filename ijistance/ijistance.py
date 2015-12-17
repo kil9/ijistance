@@ -1,8 +1,6 @@
 # -*- encoding: utf-8 -*-
 
 import json
-import logging
-import os
 import re
 import sys
 
@@ -10,17 +8,10 @@ from bs4 import BeautifulSoup
 from flask import Flask
 import requests
 
+from config import *
 
-LOG_FORMAT = '%(asctime)s [%(levelname)s] %(message)s'
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=LOG_FORMAT)
-log = logging.getLogger(__name__)
 
 app = Flask(__name__)
-
-egmobile_userid = os.environ['EGMOBILE_USERID']
-egmobile_passwd = os.environ['EGMOBILE_PASSWD']
-
-numerous_auth_string = os.environ['NUMEROUS_AUTH_STRING']
 
 @app.route('/')
 def main():
@@ -56,7 +47,9 @@ def activate():
     if not is_ok:
         log.error(msg)
         return msg
-    return u'activated. current total charge: {}'.format(report['current_total_charge'])
+    msg = u'successfully activated. current total charge: {}'.format(report['current_total_charge'])
+    log.info(msg)
+    return msg
 
 def parse_metric(metric):
     log.debug(u'metric: {}'.format(metric))
