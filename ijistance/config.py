@@ -7,12 +7,18 @@ import sys
 from logentries import LogentriesHandler
 
 
+RABBITMQ_QUEUE = 'ijistance_jobqueue'
+
 logentries_key = os.environ['LOGENTRIES_KEY']
 
-egmobile_userid = os.environ['EGMOBILE_USERID']
-egmobile_passwd = os.environ['EGMOBILE_PASSWD']
+EGMOBILE_USERID = os.environ['EGMOBILE_USERID']
+EGMOBILE_PASSWD = os.environ['EGMOBILE_PASSWD']
 
-numerous_auth_string = os.environ['NUMEROUS_AUTH_STRING']
+NUMEROUS_AUTH_STRING = os.environ['NUMEROUS_AUTH_STRING']
+
+RABBITMQ_RX_URL = os.environ['RABBITMQ_BIGWIG_RX_URL']
+RABBITMQ_TX_URL = os.environ['RABBITMQ_BIGWIG_TX_URL']
+#rabbitmq_url = os.environ['RABBITMQ_BIGWIG_URL']
 
 LOG_FORMAT = '%(asctime)s [%(levelname)s] %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=LOG_FORMAT)

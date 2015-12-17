@@ -2,3 +2,4 @@ venv/
 .env
 *.py[cod]
 runner.sh
+worker.sh
