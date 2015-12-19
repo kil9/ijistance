@@ -95,7 +95,7 @@ def iji_callback(ch, method, properties, body):
     if not is_ok:
         log.error(msg)
         return msg
-    msg = u'successfully activated. current total charge: {}'.format(report['current_total_charge'])
+    msg = u'successfully activated. current total charge({}): {}'.format(user, report['current_total_charge'])
     log.info(msg)
 
 def consume():
