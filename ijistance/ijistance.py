@@ -13,7 +13,7 @@ def main():
     log.info('i-jistance main page')
     return 'automatic report servie for i-jistance'
 
-def enqueue_activate(message='ijistance_event'):
+def enqueue_activate(message):
     log.debug('received event to publish: {}'.format(message))
 
     connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_TX_URL))
@@ -27,11 +27,15 @@ def enqueue_activate(message='ijistance_event'):
 
     return 'published {}'.format(message)
 
-@app.route('/activate')
-def activate():
+@app.route('/activate/<user>')
+def activate(user):
     log.info('i-jistance activated')
+    if user not in USERS:
+        msg = 'not a registered user: {}'.format(user)
+        log.error(msg)
+        return msg
     try:
-        msg = enqueue_activate()
+        msg = enqueue_activate(user)
     except e:
         msg = 'failed to enqueue i-jistance event'
         log.error(msg)

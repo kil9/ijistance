@@ -17,20 +17,16 @@ def parse_metric(metric):
         digits = digits[:-3]
     return digits if digits else 0
 
-def update_numerous(report):
-    keys = { 'paid_call':            '5497780356662936347',
-             'current_data_charge':  '4514103156147167693',
-             'free_call':            '6609814354450169229',
-             'used_free_call':       '7065060043860950150',
-             'remain_free_call':     '1090989293457867135',
-             'current_total_charge': '6061124877899087878' }
+def update_numerous(report, user):
+
+    metrics = metric_map[user]
 
     request_url_pattern = 'https://api.numerousapp.com/v2/metrics/{}/events'
 
-    for key in report:
-        request_url = request_url_pattern.format(keys[key])
+    for key in metrics:
+        request_url = request_url_pattern.format(metrics[key])
 
-        headers = {'Authorization': NUMEROUS_AUTH_STRING,
+        headers = {'Authorization': NUMEROUS_AUTH_STRINGS[user],
                    'Content-Type': 'application/json'}
         payload = {'Value': parse_metric(report[key]) }
         data = json.dumps(payload)
@@ -71,14 +67,15 @@ def parse_ijireport(markup):
     return report
 
 def iji_callback(ch, method, properties, body):
-    log.info(" [x] Received %r" % (body,))
+    log.info(" [x] Received user: %r" % (body,))
+    user = body
 
     LOGIN_URL = 'https://www.egmobile.co.kr/member/loginOK.php'
     BILL_URL = 'https://www.egmobile.co.kr/customer_center/bill_time.php'
 
     data = {'return_url': '/member/login.php?return_url=/',
-            'userid': EGMOBILE_USERID,
-            'passwd': EGMOBILE_PASSWD,
+            'userid': EGMOBILE_USERIDS[user],
+            'passwd': EGMOBILE_PASSWDS[user],
             'mode': 'login' }
 
     resp = requests.post(LOGIN_URL, data=data)
@@ -94,7 +91,7 @@ def iji_callback(ch, method, properties, body):
         return 'failed to get bill page'
 
     report = parse_ijireport(resp.text)
-    msg, is_ok = update_numerous(report)
+    msg, is_ok = update_numerous(report, user)
     if not is_ok:
         log.error(msg)
         return msg
