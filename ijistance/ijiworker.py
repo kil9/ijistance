@@ -53,7 +53,12 @@ def parse_ijireport(markup):
     log.debug(u'사용무료통화: {}'.format(data_set[7].text))
     log.debug(u'남은무료통화: {}'.format(data_set[8].text))
 
-    total_charge = soup.find_all(string='당월요금계')[0].find_next('td')
+    try:
+        total_charge = soup.find_all(string='당월요금계')[0].find_next('td')
+    except IndexError as e:
+        log.error(markup)
+        log.exception('당월요금계를 찾을 수 없습니다', e)
+        raise e
 
     log.debug(u'전체 요금: {}'.format(total_charge.text))
 
