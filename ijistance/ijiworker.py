@@ -17,6 +17,7 @@ def parse_metric(metric):
         digits = digits[:-3]
     return digits if digits else 0
 
+# no more numerous..
 def update_numerous(report, user):
 
     metrics = metric_map[user]
@@ -74,7 +75,9 @@ def parse_ijireport(markup):
 def iji_callback(ch, method, properties, body):
     log.info(" [x] Received user: %r" % (body,))
     user = body
+    iji_report(user)
 
+def iji_report(user):
     LOGIN_URL = 'https://www.egmobile.co.kr/member/loginOK.php'
     BILL_URL = 'https://www.egmobile.co.kr/customer_center/bill_time.php'
 
@@ -96,12 +99,13 @@ def iji_callback(ch, method, properties, body):
         return 'failed to get bill page'
 
     report = parse_ijireport(resp.text)
-    msg, is_ok = update_numerous(report, user)
-    if not is_ok:
-        log.error(msg)
-        return msg
+    #msg, is_ok = update_numerous(report, user)
+    #if not is_ok:
+        #log.error(msg)
+        #return msg
     msg = u'successfully activated. current total charge({}): {}'.format(user, report['current_total_charge'])
     log.info(msg)
+    return report
 
 def consume():
     connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_RX_URL))

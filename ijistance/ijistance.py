@@ -1,9 +1,12 @@
 # -*- encoding: utf-8 -*-
 
+import json
+
 from flask import Flask
 import pika
 
 from config import *
+from ijiworker import iji_report
 
 
 app = Flask(__name__)
@@ -27,6 +30,11 @@ def enqueue_activate(message):
 
     return 'published {}'.format(message)
 
+@app.route('/report/<user>')
+def report(user):
+    report = iji_report(user)
+    return json.dumps(report)
+
 @app.route('/activate/<user>')
 def activate(user):
     log.info('i-jistance activated')
@@ -44,4 +52,4 @@ def activate(user):
 
 
 if __name__ == '__main__':
-    app.run(port=21000, debug=True)
+    app.run(host='0.0.0.0', port=21002, debug=True)
