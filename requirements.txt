@@ -7,5 +7,6 @@ Jinja2==2.8
 Logentries==0.15
 MarkupSafe==0.23
 pika==0.10.0
+redis==2.10.5
 requests==2.9.0
 Werkzeug==0.11.2

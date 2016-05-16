@@ -6,6 +6,7 @@ import sys
 
 from bs4 import BeautifulSoup
 import pika
+import redis
 import requests
 
 from config import *
@@ -17,7 +18,7 @@ def parse_metric(metric):
         digits = digits[:-3]
     return digits if digits else 0
 
-# no more numerous..
+# XXX: no more numerous..
 def update_numerous(report, user):
 
     metrics = metric_map[user]
@@ -78,6 +79,22 @@ def iji_callback(ch, method, properties, body):
     iji_report(user)
 
 def iji_report(user):
+    iji_redis = redis.from_url(os.environ.get("REDISCLOUD_URL"))
+
+    REPORT_KEYS = ('paid_call', 'current_data_charge',
+                   'free_call', 'used_free_call',
+                   'remain_free_call', 'current_total_charge')
+
+    if iji_redis.get(REPORT_KEYS[0]):
+        log.info('getting values from redis..')
+        report = dict(map(lambda k: (k, iji_redis.get(k)), REPORT_KEYS))
+    else:
+        report = get_iji_report(user)
+        for key in report:
+            iji_redis.set(key, report[key], ex=7200) # expires in 2 hours
+    return report
+
+def get_iji_report(user):
     LOGIN_URL = 'https://www.egmobile.co.kr/member/loginOK.php'
     BILL_URL = 'https://www.egmobile.co.kr/customer_center/bill_time.php'
 

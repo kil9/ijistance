@@ -35,6 +35,16 @@ def report(user):
     report = iji_report(user)
     return json.dumps(report)
 
+@app.route('/numeric/<user>')
+def numeric(user):
+    raw_report = iji_report(user)
+    used_free_call = int(''.join(filter(unicode.isdigit, raw_report['used_free_call'])))
+    payload = {
+                'postfix': 'KB',
+                'data': { 'value': used_free_call }
+              }
+    return json.dumps(payload)
+
 @app.route('/activate/<user>')
 def activate(user):
     log.info('i-jistance activated')
