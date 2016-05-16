@@ -85,13 +85,13 @@ def iji_report(user):
                    'free_call', 'used_free_call',
                    'remain_free_call', 'current_total_charge')
 
-    if iji_redis.get(REPORT_KEYS[0]):
+    if iji_redis.get(REPORT_KEYS[0] + '_' + user):
         log.info('getting values from redis..')
-        report = dict(map(lambda k: (k, iji_redis.get(k)), REPORT_KEYS))
+        report = dict(map(lambda k: (k, iji_redis.get(k + '_' + user)), REPORT_KEYS))
     else:
         report = get_iji_report(user)
         for key in report:
-            iji_redis.set(key, report[key], ex=7200) # expires in 2 hours
+            iji_redis.set(key + '_' + user, report[key], ex=7200) # expires in 2 hours
     return report
 
 def get_iji_report(user):

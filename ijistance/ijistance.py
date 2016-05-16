@@ -46,7 +46,11 @@ def numerics_data(user):
 def get_numerics_json(user, key, unit):
     raw_report = iji_report(user)
     value = raw_report[key]
-    parsed_value = int(''.join(filter(str.isdigit, list(str(value)))))
+    if type(value) == unicode:
+        parsed_value = int(''.join(filter(unicode.isdigit, list(value))))
+    else:
+        parsed_value = int(''.join(filter(str.isdigit, list(value))))
+
     payload = { 'postfix': unit,
                 'data': { 'value': parsed_value }
               }
