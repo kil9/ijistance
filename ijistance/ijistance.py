@@ -35,13 +35,20 @@ def report(user):
     report = iji_report(user)
     return json.dumps(report)
 
-@app.route('/numeric/<user>')
-def numeric(user):
+@app.route('/numerics/bill/<user>')
+def numerics_bill(user):
+    return get_numerics_json(user, 'current_total_charge', 'KRW')
+
+@app.route('/numerics/data/<user>')
+def numerics_data(user):
+    return get_numerics_json(user, 'used_free_call', 'KB')
+
+def get_numerics_json(user, key, unit):
     raw_report = iji_report(user)
-    used_free_call = int(''.join(filter(unicode.isdigit, raw_report['used_free_call'])))
-    payload = {
-                'postfix': 'KB',
-                'data': { 'value': used_free_call }
+    value = raw_report[key]
+    parsed_value = int(''.join(filter(str.isdigit, list(str(value)))))
+    payload = { 'postfix': unit,
+                'data': { 'value': parsed_value }
               }
     return json.dumps(payload)
 
